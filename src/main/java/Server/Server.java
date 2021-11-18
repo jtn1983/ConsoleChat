@@ -13,9 +13,9 @@ public class Server {
 
     private List<Connection> connections = Collections.synchronizedList(new ArrayList<Connection>());
     private ServerSocket serverSocket;
-    private FileWriter writer = new FileWriter(LOG_FILE_NAME, true);
+    private Logger logger = new Logger(LOG_FILE_NAME);
 
-    public Server() throws IOException {
+    public Server() {
         try {
             serverSocket = new ServerSocket(portFromSetupFile(SETUP_FILE_NAME));
             while (true) {
@@ -35,10 +35,15 @@ public class Server {
         }
     }
 
+    public synchronized void log(String msg) {
+        logger.log(msg);
+    }
+
     public synchronized void sendMessageAll(String msg) {
         for (Connection connection : connections) {
             connection.sendMsg(msg);
         }
+        log(msg);
     }
 
     public synchronized void closeAll() {
@@ -48,15 +53,6 @@ public class Server {
                 connection.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public synchronized void logMessage(String msg) {
-        try {
-            writer.write(msg);
-            writer.flush();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }

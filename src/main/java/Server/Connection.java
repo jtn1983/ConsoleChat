@@ -36,7 +36,6 @@ public class Connection extends Thread {
                 str = in.readLine();
                 if (str == null || str.equals("exit")) break;
                 server.sendMessageAll(name + ": " + str);
-                server.logMessage(name + "(" + new Date() + ")" + ": " + str + "\n");
             }
 
             server.sendMessageAll(name + " вышел из чата");

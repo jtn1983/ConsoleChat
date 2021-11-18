@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.Date;
 import java.util.Scanner;
 
 public class Client {
@@ -13,11 +12,11 @@ public class Client {
     public BufferedReader in;
     private PrintWriter out;
     private Socket socket;
-    private FileWriter writer = new FileWriter(LOG_FILENAME, true);
+    private Logger logger = new Logger(LOG_FILENAME);
 
-    public Client() throws IOException {
+    public Client() {
         Scanner scanner = new Scanner(System.in);
-        try{
+        try {
             socket = new Socket();
             String[] setup = setupClientFromFile();
             socket.connect(new InetSocketAddress(setup[0], Integer.parseInt(setup[1])), 1000);
@@ -37,13 +36,12 @@ public class Client {
                 str = scanner.nextLine();
                 out.println(str);
                 if (str.equals("exit")) break;
-                logMessage(name + "(" + new Date() + ")" + ": " + str);
             }
             sender.stopped();
 
-        }catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException e) {
             System.out.println("Сервер не отвечает. Проверьте настройки подключения");
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (socket != null) {
@@ -56,8 +54,8 @@ public class Client {
         try (BufferedReader reader = new BufferedReader(new FileReader(SETUP_FILE_NAME))) {
             String line = reader.readLine();
             return line.split(" ");
-        }catch (FileNotFoundException e) {
-                System.out.println("Файл настроек не найден");
+        } catch (FileNotFoundException e) {
+            System.out.println("Файл настроек не найден");
         } catch (Exception e) {
             System.out.println("Ошибка конфигурационного файла");
         }
@@ -76,27 +74,23 @@ public class Client {
     }
 
     public synchronized void logMessage(String msg) {
-        try {
-            writer.write(msg + "\n");
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        logger.log(msg);
     }
 
     private class Sender extends Thread {
 
         public boolean stopped = false;
 
-        public void stopped(){
+        public void stopped() {
             stopped = true;
         }
 
         @Override
-        public void run(){
+        public void run() {
             try {
-                while (!stopped){
+                while (!stopped) {
                     String str = in.readLine();
+                    logMessage(str);
                     System.out.println(str);
                 }
             } catch (IOException e) {
