@@ -10,14 +10,12 @@ import java.util.List;
 public class Server {
     private static final String SETUP_FILE_NAME = "setup-server.txt";
     private static final String LOG_FILE_NAME = "server.log";
-
     private List<Connection> connections = Collections.synchronizedList(new ArrayList<Connection>());
     private ServerSocket serverSocket;
     private Logger logger = new Logger(LOG_FILE_NAME);
 
     public Server() {
-        try {
-            serverSocket = new ServerSocket(portFromSetupFile(SETUP_FILE_NAME));
+        try (final ServerSocket serverSocket = new ServerSocket(portFromSetupFile(SETUP_FILE_NAME))) {
             while (true) {
                 Socket socket = serverSocket.accept();
                 Connection connection = new Connection(socket, this);
@@ -29,9 +27,7 @@ public class Server {
         } catch (IOException e) {
             System.out.println("Ошибка запуска сервера");
         } finally {
-            if (serverSocket != null) {
-                closeAll();
-            }
+            closeAll();
         }
     }
 
