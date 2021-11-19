@@ -11,13 +11,11 @@ public class Client {
     private final String LOG_FILENAME = "client.log";
     public BufferedReader in;
     private PrintWriter out;
-    private Socket socket;
     private Logger logger = new Logger(LOG_FILENAME);
 
     public Client() {
         Scanner scanner = new Scanner(System.in);
-        try {
-            socket = new Socket();
+        try (Socket socket = new Socket()) {
             String[] setup = setupClientFromFile();
             socket.connect(new InetSocketAddress(setup[0], Integer.parseInt(setup[1])), 1000);
 
@@ -43,10 +41,6 @@ public class Client {
             System.out.println("Сервер не отвечает. Проверьте настройки подключения");
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (socket != null) {
-                close();
-            }
         }
     }
 
@@ -61,16 +55,6 @@ public class Client {
         }
         System.exit(0);
         return null;
-    }
-
-    public void close() {
-        try {
-            in.close();
-            out.close();
-            socket.close();
-        } catch (Exception e) {
-            System.out.println("Потоки не закрыты");
-        }
     }
 
     public synchronized void logMessage(String msg) {

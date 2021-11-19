@@ -11,7 +11,6 @@ public class Server {
     private static final String SETUP_FILE_NAME = "setup-server.txt";
     private static final String LOG_FILE_NAME = "server.log";
     private List<Connection> connections = Collections.synchronizedList(new ArrayList<Connection>());
-    private ServerSocket serverSocket;
     private Logger logger = new Logger(LOG_FILE_NAME);
 
     public Server() {
@@ -44,7 +43,6 @@ public class Server {
 
     public synchronized void closeAll() {
         try {
-            serverSocket.close();
             for (Connection connection : connections) {
                 connection.close();
             }
