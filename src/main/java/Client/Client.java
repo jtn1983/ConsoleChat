@@ -74,6 +74,10 @@ public class Client {
             try {
                 while (!stopped) {
                     String str = in.readLine();
+                    if (str == null) {
+                        System.out.println("Сервер разорвал соединение");
+                        System.exit(0);
+                    }
                     logMessage(str);
                     System.out.println(str);
                 }
